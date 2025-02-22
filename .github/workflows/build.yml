@@ -31,10 +31,13 @@ jobs:
             echo "STATUS=release" >> build_output.txt
           fi
 
-      - name: Upload JAR file and build output
+      - name: Create a tarball of the entire project directory
+        run: |
+          echo "Creating a tarball of the project directory..."
+          tar -czf project-artifacts.tar.gz .
+
+      - name: Upload entire project directory as a tarball
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: |
-            build/libs/*.jar
-            build_output.txt
+          name: full-project-artifacts
+          path: project-artifacts.tar.gz
