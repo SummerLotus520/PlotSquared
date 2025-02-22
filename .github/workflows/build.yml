@@ -20,13 +20,21 @@ jobs:
           java-version: 21
 
       - name: Clean Build
-        run: ./gradlew clean build
+        run: ./gradlew clean build > build_output.txt 2>&1
 
-      - name: Determine release status
+      - name: Determine release status and output to file
         if: ${{ runner.os == 'Linux' }}
         run: |
           if [ "$(./gradlew properties | awk '/^version:/ { print $2; }' | grep '\-SNAPSHOT')" ]; then
-            echo "STATUS=snapshot" >> $GITHUB_ENV
+            echo "STATUS=snapshot" >> build_output.txt
           else
-            echo "STATUS=release" >> $GITHUB_ENV
+            echo "STATUS=release" >> build_output.txt
           fi
+
+      - name: Upload JAR file and build output
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: |
+            build/libs/*.jar
+            build_output.txt
